@@ -1,0 +1,6 @@
+version: '2'
+services:
+  xenial64:
+    build: docker/xenial64/
+    privileged: true
+    entrypoint: /sbin/init

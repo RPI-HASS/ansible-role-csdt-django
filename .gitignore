@@ -1,0 +1,5 @@
+### Ansible Template
+*.retry
+
+### Vagrant Template
+.vagrant/

@@ -1,0 +1,9 @@
+---
+- name: Roles for csdt server
+  hosts: all
+  roles:
+    - role_under_test
+
+  vars:
+    # django variables
+    csdt_django_git_repository: ""
