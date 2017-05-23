@@ -98,7 +98,7 @@ Django secret key.
 (default: `True`)  
 Set Django to debug mode.
 
-csdt_django_settings_allowed_hosts:   
+`csdt_django_settings_allowed_hosts`   
 default:
 ```
   - '127.0.0.1'
