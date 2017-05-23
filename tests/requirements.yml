@@ -2,3 +2,6 @@
   - src: git+https://github.com/geerlingguy/ansible-role-postgresql
     version: master
     name: postgresql
+  - src: git+https://github.com/geerlingguy/ansible-role-nodejs
+    version: master
+    name: nodejs

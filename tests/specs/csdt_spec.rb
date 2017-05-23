@@ -51,3 +51,11 @@ control '04' do
     its('status') { should cmp 200 }
   end
 end
+control '05' do
+  impact 0.5
+  title 'Verify Harp version'
+  desc 'Checks the version of Harp is greater than 0.23.0'
+  describe command('harp -V') do
+    its('stdout') { should be >= '0.23.0' }
+  end
+end

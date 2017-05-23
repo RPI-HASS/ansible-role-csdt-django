@@ -6,6 +6,7 @@ Installs [rpi_csdt_community](https://github.com/RPI-HASS/rpi_csdt_community) on
 
 ## Requirements
 - postgresql
+- nodejs
 
 ## Install
 

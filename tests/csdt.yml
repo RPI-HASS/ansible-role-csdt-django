@@ -3,6 +3,7 @@
   hosts: all
   roles:
     - postgresql
+    - {role: nodejs, nodejs_install_npm_user: root}
     - role_under_test
 
   vars:

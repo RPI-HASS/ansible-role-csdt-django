@@ -11,3 +11,9 @@
 - name: Install pexpect
   pip:
     name: pexpect
+
+- name: harp - install harp
+  npm:
+    name: harp
+    global: yes
+    state: present
