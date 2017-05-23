@@ -1,0 +1,18 @@
+---
+__csdt_django_packages:
+  - python2.7
+  - python-dev
+  - python-pip
+  - libxml2-dev
+  - libxslt1-dev
+  - libffi-dev
+  - libpq-dev
+  - libssl-dev
+  - libcurl4-openssl-dev
+  - build-essential
+  - git
+  - node-less
+  - expect
+  - supervisor
+  - postgis
+  - postgresql-9.5-postgis-2.2

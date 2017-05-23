@@ -1,0 +1,166 @@
+---
+# Variable setup.
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+# Setup/install tasks.
+- include: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+# Git Pull Repository
+
+- name: Git Pull Repository
+  git:
+    repo: "{{ csdt_django_git_repository }}"
+    dest: "{{ csdt_django_git_destination }}"
+    clone: "{{ csdt_django_git_clone }}"
+    update: "{{ csdt_django_git_update }}"
+    version: "{{ csdt_django_git_version }}"
+    recursive: "{{ csdt_django_git_recursive }}"
+    accept_hostkey: "{{ csdt_django_git_accept_hostkey }}"
+
+# pip Install Python packages
+
+- name: Install virtualenv
+  pip:
+    name: virtualenv
+
+- name: Install pexpect
+  pip:
+    name: pexpect
+
+- name: Install Requirements with pip.
+  pip:
+    requirements: "{{ csdt_django_git_destination }}/requirements.txt"
+    extra_args: --upgrade
+    virtualenv: "/opt/{{ csdt_django_app_name }}"
+    virtualenv_python: python2.7
+- name: Install Gunicorn
+  pip:
+    name: gunicorn
+    virtualenv: "/opt/{{ csdt_django_app_name }}"
+
+# Create configuration file
+
+- name: Set file permissions on manage.py
+  file:
+    path: "{{ csdt_django_git_destination }}/manage.py"
+    mode: 0755
+  changed_when: False
+
+- name: Configuration file
+  template:
+    src: "templates/local_settings.py.j2"
+    dest: "{{ csdt_django_app_conf }}"
+    mode: "0644"
+  changed_when: False
+
+# Database Migrations
+
+- name: Django Make Migrations
+  django_manage:
+    command: makemigrations --noinput
+    app_path: "{{ csdt_django_git_destination }}"
+    virtualenv: "/opt/{{ csdt_django_app_name }}"
+- name: Django Database Migrations
+  django_manage:
+    command: migrate
+    app_path: "{{ csdt_django_git_destination }}"
+    virtualenv: "/opt/{{ csdt_django_app_name }}"
+
+# Collect Static Pages
+
+- name: Django - Collect Static Pages
+  django_manage:
+    command: collectstatic
+    app_path: "{{ csdt_django_git_destination }}"
+    virtualenv: "/opt/{{ csdt_django_app_name }}"
+  notify: restart supervisorctl
+  changed_when: False
+
+- name: Ensure directory ownership is correct
+  file:
+    dest: "{{ csdt_django_git_destination }}"
+    owner: "{{ csdt_django_conf_file_user }}"
+    group: "{{ csdt_django_conf_file_group }}"
+    mode: 0655
+    recurse: yes
+  changed_when: False
+
+- name: Ensure static write access
+  file:
+    dest: "{{ csdt_django_git_destination }}/collected_static"
+    owner: "{{ csdt_django_conf_file_user }}"
+    group: "{{ csdt_django_conf_file_group }}"
+    mode: 0775
+    recurse: yes
+  changed_when: False
+
+# Create superuser
+- name: Super User existed script copy
+  template:
+    src: templates/superuserexists.sh.j2
+    dest: "{{ csdt_django_git_destination }}/superuserexists.sh"
+    mode: 0755
+  changed_when: False
+- name: Check if Superuser exists
+  command: "{{ csdt_django_git_destination }}/superuserexists.sh"
+  args:
+    chdir: "{{ csdt_django_git_destination }}"
+  register: superuser_existed
+  changed_when: False
+- name: remove superuserexists.sh
+  file:
+    path: "{{ csdt_django_git_destination }}/superuserexists.sh"
+    state: absent
+  changed_when: False
+
+- name: Create Superuser
+  django_manage:
+    command: "createsuperuser --noinput --username={{csdt_django_superuser}} --email={{csdt_django_superemail}}"
+    app_path: "{{ csdt_django_git_destination }}"
+    virtualenv: "/opt/{{ csdt_django_app_name }}"
+  when: superuser_existed.stdout.find('False') != -1
+
+- name: Change password tricks
+  template:
+    src: templates/changepassword.sh.j2
+    dest: "{{ csdt_django_git_destination }}/changepassword.sh"
+    mode: 0755
+  changed_when: False
+- name: Change password
+  command: "{{ csdt_django_git_destination }}/changepassword.sh"
+  args:
+    chdir: "{{ csdt_django_git_destination }}"
+  changed_when: False
+- name: remove changepassword.sh
+  file:
+    path: "{{ csdt_django_git_destination }}/changepassword.sh"
+    state: absent
+  changed_when: False
+
+# Setup gunicorn
+
+- name: Gunicorn Configuration file
+  template:
+    src: "templates/gunicorn_config.py.j2"
+    dest: "{{ csdt_django_git_destination }}/gunicorn_config.py"
+
+- name: Gunicorn Configuration file permissions
+  file:
+    dest: "{{ csdt_django_git_destination }}/gunicorn_config.py"
+    owner: "{{ csdt_django_conf_file_user }}"
+    group: "{{ csdt_django_conf_file_group }}"
+    mode: "0644"
+  changed_when: False
+
+# Setup supervisord
+
+- name: Supervisord Configuration file
+  template:
+    src: "templates/csdt.conf.j2"
+    dest: "/etc/supervisor/conf.d/csdt.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart supervisord

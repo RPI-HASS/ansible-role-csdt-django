@@ -1,0 +1,41 @@
+---
+# Default variables
+
+csdt_django_git_repository: "https://github.com/RPI-HASS/rpi_csdt_community.git"
+csdt_django_git_destination: "/var/www/django"
+csdt_django_git_clone: "yes"
+csdt_django_git_update: "yes"
+csdt_django_git_version: "HEAD"
+csdt_django_git_recursive: "yes"
+csdt_django_git_accept_hostkey: "yes"
+
+# Configuration variables
+csdt_django_app_name: "django"
+csdt_django_app_location: "{{ csdt_django_git_destination }}/{{ csdt_django_app_name }}"
+csdt_django_app_conf: "{{ csdt_django_app_location }}/local_settings.py"
+csdt_django_conf_file_user: "root"
+csdt_django_conf_file_group: "www-data"
+
+csdt_django_superuser: "admin"
+csdt_django_superpass: "password"
+csdt_django_superemail: "admin@example.com"
+csdt_django_secretkey: "defaulttestsecretkey"
+
+csdt_django_settings_debug: True
+csdt_django_settings_allowed_hosts:
+  - '127.0.0.1'
+  - '0.0.0.0'
+csdt_django_settings_csrf_trusted_origins:
+  - 'your.fqdn.here'
+csdt_django_settings_google_analytics_id: 'AA-1234567-8'
+csdt_django_settings_google_analytics_domain: 'your.fqdn.here'
+
+csdt_django_gunicorn_command: "/opt/{{ csdt_django_app_name }}/bin/gunicorn"
+csdt_django_gunicorn_pythonpath: "{{ csdt_django_app_location }}"
+csdt_django_gunicorn_bind: "127.0.0.1:8001"
+csdt_django_gunicorn_workers: "{{ ( 2 * ansible_processor_vcpus) +1 }}"
+csdt_django_gunicorn_user: "www-data"
+
+csdt_django_supervisord_command: "{{ csdt_django_gunicorn_command }} -c {{ csdt_django_git_destination }}/gunicorn_config.py {{ csdt_django_app_name }}.wsgi --user={{ csdt_django_supervisord_user }}"
+csdt_django_supervisord_directory: "{{ csdt_django_git_destination }}"
+csdt_django_supervisord_user: "www-data"

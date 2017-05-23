@@ -1,0 +1,8 @@
+[program:csdt]
+environment = PATH="/opt/{{ csdt_django_app_name }}/bin:%(ENV_PATH)s"
+command = {{ csdt_django_supervisord_command }}
+directory = {{ csdt_django_supervisord_directory }}
+user = {{ csdt_django_supervisord_user }}
+autostart=true
+autorestart=true
+redirect_stderr=True

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+source /opt/{{ csdt_django_app_name }}/bin/activate
+
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(username='{{csdt_django_superuser}}').count()>0)" | {{ csdt_django_git_destination }}/manage.py shell
+
+deactivate
