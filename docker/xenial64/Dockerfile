@@ -19,6 +19,8 @@ RUN apt-key add /tmp/chef.asc \
     && apt-get update -y \
     && apt-get --no-install-recommends install -y \
       ansible \
+      git \
+      sudo \
       inspec=1.25.0-1 \
       coreutils \
       net-tools \

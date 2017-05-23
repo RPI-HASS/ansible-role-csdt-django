@@ -32,6 +32,18 @@ function main() {
   docker exec -t "${container}" mkdir "${WORKSPACE}/tests/roles"
   docker exec -t "${container}" ln -s "${WORKSPACE}/" "${WORKSPACE}/tests/roles/role_under_test"
 
+  printf "\n"
+
+  # Install requirements if `requirements.yml` is present.
+  if [ -f "$PWD/tests/requirements.yml" ]; then
+    printf ${green}"Requirements file detected; installing dependencies."${neutral}"\n"
+    docker exec -t "${container}" env ANSIBLE_FORCE_COLOR=1 ansible-galaxy \
+                install --roles-path "${WORKSPACE}/tests/roles/" \
+                -r "${WORKSPACE}/tests/requirements.yml"
+  fi
+
+printf "\n"
+
   # Validate syntax
   docker exec -t "${container}" env ANSIBLE_FORCE_COLOR=1 ansible-playbook \
               -i "${WORKSPACE}/tests/inventory" \
@@ -62,8 +74,8 @@ function main() {
   # Run tests.
   docker exec -t "${container}" inspec exec "${WORKSPACE}/tests/specs/${PLAYBOOK}_spec.rb"
 }
-
 [[ -z "${CI:-}" ]] && trap debug ERR
 trap cleanup EXIT
 
 main "${@}"
+#debug "${@}"

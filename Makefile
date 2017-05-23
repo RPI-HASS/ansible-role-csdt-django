@@ -1,6 +1,6 @@
 BOXES := $(notdir $(wildcard docker/*))
 
-PLAYBOOK        ?= webhook
+PLAYBOOK        ?= csdt
 
 define USAGE
 targets:
@@ -21,7 +21,7 @@ machines:
 
 variables:
 
-  PLAYBOOK          Choose Playbook to test. Default: 'webhook'.
+  PLAYBOOK          Choose Playbook to test. Default: 'csdt'.
 endef
 
 is_machine_target = $(if $(findstring $(firstword $(MAKECMDGOALS)),$(BOXES)),true,false)
@@ -31,9 +31,9 @@ all:
 
 clean:
 ifeq (true,$(call is_machine_target))
-	docker rmi -f ansiblewebhook_$(firstword $(MAKECMDGOALS))
+	docker rmi -f ansiblecsdt_$(firstword $(MAKECMDGOALS))
 else
-	-docker images -q ansiblewebhook* | xargs docker rmi -f
+	-docker images -q ansiblecsdt* | xargs docker rmi -f
 endif
 
 help:
@@ -49,7 +49,7 @@ endif
 $(BOXES):
 # Don't build an image just to delete it.
 ifeq (,$(findstring clean,$(lastword $(MAKECMDGOALS))))
-	{ docker images ansiblewebhook_$@ | grep $@; } && exit || docker-compose build $@
+	{ docker images ansiblecsdt_$@ | grep $@; } && exit || docker-compose build $@
 endif
 
 .PHONY: all \
