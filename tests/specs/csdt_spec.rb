@@ -43,7 +43,7 @@ end
 control '04' do
   impact 1.0
   title 'Verify Web Service is running with status code 200'
-  desc 'Ensures postgresql service is up and running'
+  desc 'Ensures Web Service is listening'
   describe port(8002) do
     it { should be_listening }
   end
