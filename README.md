@@ -148,10 +148,17 @@ This role includes a Vagrantfile used with a Docker-based test harness that appr
 3. SSH into the VM with: `vagrant ssh`
 4. Run tests with `make`.
 
+#### Testing with Docker and inspec
 ```
 make -C /vagrant xenial64 test
 ```
 See `make help` for more information including a full list of available targets.
+
+#### Install in Vagrant VM for interactive testing
+```
+make -C /vagrant install
+```
+- On your local machine, navigate your web browser to `http://127.0.0.1:8002`
 
 ## Example Playbook
 

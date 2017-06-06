@@ -1,7 +1,7 @@
 ---
   - src: git+https://github.com/geerlingguy/ansible-role-postgresql
-    version: master
+    version: 67bb83f964c7854740f4a83f7a002cf5c5a73eb1
     name: postgresql
   - src: git+https://github.com/geerlingguy/ansible-role-nodejs
-    version: master
+    version: 885d12b1760b7b6d255b76c9237472e61c2ce4ca
     name: nodejs
