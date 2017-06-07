@@ -16,6 +16,15 @@
         password: "{{ csdt_django_secret_pass }}"
         priv: ALL
         db: "{{ csdt_django_secret_db }}"
+    postgresql_ext:
+        name: adminpack
+        db: "{{ csdt_django_secret_db }}"
+    postgresql_ext:
+        name: postgis
+        db: "{{ csdt_django_secret_db }}"
+    postgresql_ext:
+        name: postgis_topology
+        db: "{{ csdt_django_secret_db }}"
 
     # django variables
     # django secrets
