@@ -7,6 +7,16 @@
 - include: setup-Debian.yml
   when: ansible_os_family == 'Debian'
 
+# Add PostgreSQL extensions
+- name: Add PostgreSQL extensions to database
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  postgresql_ext:
+    name: "{{ item }}"
+    db: "{{ csdt_django_secret_db }}"
+  with_items: "{{ __csdt_django_postgresql_ext }}"
+
 # Git Pull Repository
 
 - name: Git Pull Repository

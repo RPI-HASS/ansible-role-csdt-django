@@ -16,3 +16,8 @@ __csdt_django_packages:
   - supervisor
   - postgis
   - postgresql-9.5-postgis-2.2
+
+__csdt_django_postgresql_ext:
+  - adminpack
+  - postgis
+  - postgis_topology
