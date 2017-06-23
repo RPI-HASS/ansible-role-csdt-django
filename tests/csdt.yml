@@ -43,6 +43,7 @@
     csdt_django_git_destination: "/var/www/csdt.rpi.edu"
     csdt_django_app_name: "rpi_csdt_community"
     csdt_django_git_clone: "yes"
+    csdt_django_git_version: "develop"
     csdt_django_git_update: "no"
     csdt_django_conf_file_group: "www-data"
 
