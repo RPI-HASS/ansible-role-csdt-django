@@ -21,6 +21,12 @@ csdt_django_superpass: "password"
 csdt_django_superemail: "admin@example.com"
 csdt_django_secretkey: "defaulttestsecretkey"
 
+csdt_django_recaptcha_private: "not a real key"
+csdt_django_recaptcha_public: "not a real key"
+
+csdt_django_email_API_key: "not a real key"
+csdt_django_email_API_password: "not a real key"
+
 csdt_django_settings_debug: True
 csdt_django_settings_allowed_hosts:
   - '127.0.0.1'
