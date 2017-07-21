@@ -94,6 +94,21 @@ Django superuser email address.
 (default: `defaulttestsecretkey`)  
 Django secret key.  
 
+`csdt_django_recaptcha_private`
+(default: 'not a real key')
+Django Recaptcha Private Key
+
+`csdt_django_recaptcha_public`
+(default: 'not a real key')
+Django Recaptcha Public Key
+
+`csdt_django_email_API_key`
+(default: 'not a real key')
+Django Email API Key
+
+`csdt_django_email_API_password`
+(default: 'not a real key')
+Django Email API Password
 
 `csdt_django_settings_debug`  
 (default: `True`)  
