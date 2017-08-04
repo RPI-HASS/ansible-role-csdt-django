@@ -67,11 +67,6 @@
 
 # Database Migrations
 
-- name: Django Make Migrations
-  django_manage:
-    command: makemigrations --noinput
-    app_path: "{{ csdt_django_git_destination }}"
-    virtualenv: "/opt/{{ csdt_django_app_name }}"
 - name: Django Database Migrations
   django_manage:
     command: migrate
