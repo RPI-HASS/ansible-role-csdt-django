@@ -24,6 +24,9 @@ csdt_django_secretkey: "defaulttestsecretkey"
 csdt_django_recaptcha_private: "not a real key"
 csdt_django_recaptcha_public: "not a real key"
 
+csdt_django_Google_API_key: "not a real key"
+csdt_django_Census_API_key: "not a real key"
+
 csdt_django_email_API_key: "not a real key"
 csdt_django_email_API_password: "not a real key"
 

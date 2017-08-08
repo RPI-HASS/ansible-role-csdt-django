@@ -106,6 +106,14 @@ Django Recaptcha Public Key
 (default: 'not a real key')
 Django Email API Key
 
+`csdt_django_Google_API_key`
+(default: 'not a real key')
+Google API key for maps
+
+`csdt_django_Census_API_key`
+(default: 'not a real key')
+US Census Bureau API Key
+
 `csdt_django_email_API_password`
 (default: 'not a real key')
 Django Email API Password
