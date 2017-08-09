@@ -3,7 +3,7 @@ ADMINS = (
 )
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': '{{ csdt_django_secret_db }}',
         'USER': '{{ csdt_django_secret_user }}',
         'PASSWORD': '{{ csdt_django_secret_pass }}',
@@ -41,3 +41,5 @@ RECAPTCHA_PRIVATE_KEY = '{{ csdt_django_recaptcha_private }}'
 RECAPTCHA_PUBLIC_KEY = '{{ csdt_django_recaptcha_public }}'
 EMAIL_API_KEY = '{{ csdt_django_email_API_key }}'
 EMAIL_HOST_PASSWORD = '{{ csdt_django_email_API_password }}'
+GOOGLE_API_KEY = '{{ csdt_django_Google_API_key }}'
+CENSUS_API_KEY = '{{ csdt_django_Census_API_key }}'
