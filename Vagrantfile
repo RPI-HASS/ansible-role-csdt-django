@@ -9,15 +9,17 @@ VAGRANTFILE_API_VERSION = "2"
 $setupScript = <<SCRIPT
 echo provisioning docker...
 sudo apt-get update
-sudo apt-add-repository ppa:ansible/ansible -y
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-sudo apt-get install ansible python3-pip -y && sudo pip3 install --upgrade pip && sudo pip install pyyaml
+sudo apt-get install python3-pip -y && sudo pip3 install --upgrade pip && sudo pip install pyyaml
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
+apt-add-repository -y ppa:ansible/ansible
 sudo apt-get update
+apt-get -y -o Dpkg::Options::="--force-confold" install ansible
+# Show available version apt-cache madison docker-ce
 sudo apt-get -o Dpkg::Options::="--force-confnew" install --force-yes -y docker-ce="17.03.1~ce-0~ubuntu-xenial"
 sudo usermod -a -G docker vagrant
 sudo pip install docker-compose==1.13.0
@@ -25,6 +27,11 @@ sudo pip install docker-compose==1.13.0
 docker version
 
 docker-compose version
+echo "###########################################"
+echo "#                IP ADDRESS               #"
+echo "#                                         #"
+ip a | grep brd | egrep "[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\.[[:digit:]]{1,3}\/[[:digit:]]{1,2}" | awk '{print "               ",$2}'
+echo "###########################################"
 SCRIPT
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
