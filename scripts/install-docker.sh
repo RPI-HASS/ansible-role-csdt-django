@@ -12,7 +12,7 @@ add-apt-repository \
 apt-get update
 apt-get -o Dpkg::Options::="--force-confnew" install --force-yes -y docker-ce="${DOCKER_VERSION}"
 
-sudo pip install docker-compose=={DOCKER_COMPOSE_VERSION}
+sudo pip install docker-compose=="${DOCKER_COMPOSE_VERSION}"
 
 docker version
 
