@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+usage="$(basename "$0") [-h] [-r hostname] [-u username] [-d database Name]
+
+--  This script will backup a remote postgresql database over ssh then restore the database
+    dump to the local server that the script is run from.
+    This script will also rsync the media folder from the remote to the local server.
+
+where:
+    -h, --help        show this help text
+    -r, --remote      set the Remote hostname or IP address (Default: localhost)
+    -u, --sshuser     set the username of the Remote host (Default: Current User)
+    -d, --remotedb    set the remote database name for dumping sql data
+    -l, --localdb     set the local database name for dumping sql data
+    -o, --datauser    set the database username for permissions
+    -f, --datafolder  set the location of the .sql dump file (Default: /var/lib/postgresql)
+    -s, --mediasource set the source directory of media files
+    -m, --mediadest   set the destination directory of media files
+
+example:
+    $ ./`basename "$0"` --remote=server.fqdn --sshuser=postgres --remotedb=rpi_csdt_community --localdb=csdt --datauser=csdt --mediasource=/var/www/media/ --mediadest=/var/www/media
+"
+
+function get-ssh-keys {
+    mkdir -p ~/.ssh
+    touch ~/.ssh/known_hosts
+    ssh-keygen -R $1
+    ssh-keyscan -H $1 >> ~/.ssh/known_hosts
+}
+
+function backup-postgres {
+    echo "--------------------------------------------------------------------"
+    echo "                      Backup Postgres Database                      "
+    echo "--------------------------------------------------------------------"
+    get-ssh-keys $1
+    echo "Remote: $1"
+    echo "SSH User: $2"
+    echo "Database: $3"
+    echo "Datafolder: $4"
+    echo "------------------------------------"
+    ssh -oBatchMode=yes -C $2@$1 << EOF
+        echo "Session Created on:   " `date`
+        echo "Session Created as:   " `whoami`"@"`hostname -f`
+        echo "Session Created from: " `who am i --ips|awk '{print $4}' #ubuntu 14`
+        echo "--------------------------------------------------------------------"
+        pg_dump --no-owner -c $3 > $4/$3.sql
+EOF
+}
+
+function rsync-data {
+    # rsync-data REMOTE SSHUSER RemoteFileLocation LocalFileLocation
+    echo "--------------------------------------------------------------------"
+    echo "                      Running Rsync on data                         "
+    echo "--------------------------------------------------------------------"
+    rsync -azv $2@$1:$3 $4
+}
+
+function restore-postgres {
+    echo "--------------------------------------------------------------------"
+    echo "                      Restore Postgres Database                     "
+    echo "--------------------------------------------------------------------"
+    su - postgres -c "psql -d $1 -f $3"
+    su - postgres -c "psql $1 -c \"GRANT ALL ON ALL TABLES IN SCHEMA public to $2\""
+    su - postgres -c "psql $1 -c \"GRANT ALL ON ALL SEQUENCES IN SCHEMA public to $2\""
+    su - postgres -c "psql $1 -c \"GRANT ALL ON ALL FUNCTIONS IN SCHEMA public to $2\""
+}
+
+REMOTE="localhost"
+SSHUSER=`whoami`
+DATABASE=""
+DATAUSER=""
+DATAFOLDER="/var/lib/postgresql"
+
+while getopts ':hrd:u:-:' option; do
+    case "$option" in
+        h ) echo "$usage" && exit 2        ;;
+        r ) REMOTE="$OPTARG"               ;;
+        u ) SSHUSER="$OPTARG"              ;;
+        d ) REMOTEDB="$OPTARG"             ;;
+        l ) LOCALDB="$OPTARG"              ;;
+        o ) DATAUSER="$OPTARG"             ;;
+        f ) DATAFOLDER="$OPTARG"           ;;
+        s ) MEDIASOURCE="$OPTARG"          ;;
+        m ) MEDIADEST="$OPTARG"            ;;
+        - ) LONG_OPTARG="${OPTARG#*=}"
+            case $OPTARG in
+                help           ) echo "$usage" && exit 2      ;;
+                help*          ) echo "No arg for --$OPTARG option" >&2; exit 2 ;;
+                remote=?*      ) REMOTE="$LONG_OPTARG"               ;;
+                sshuser=?*     ) SSHUSER="$LONG_OPTARG"              ;;
+                remotedb=?*    ) REMOTEDB="$LONG_OPTARG"             ;;
+                localdb=?*     ) LOCALDB="$LONG_OPTARG"              ;;
+                datauser=?*    ) DATAUSER="$LONG_OPTARG"             ;;
+                datafolder=?*  ) DATAFOLDER="$LONG_OPTARG"           ;;
+                mediasource=?* ) MEDIASOURCE="$LONG_OPTARG"          ;;
+                mediadest=?*   ) MEDIADEST="$LONG_OPTARG"            ;;
+                '' )        break ;; # "--" terminates argument processing
+                * )         echo "Illegal option --$OPTARG" >&2; exit 2 ;;
+            esac
+        ;;
+        \? ) exit 2 ;;  # getopts already reported the illegal option
+    esac
+done
+shift $((OPTIND-1))
+# Create .sql file on remote server
+backup-postgres $REMOTE $SSHUSER $REMOTEDB $DATAFOLDER
+# Copy .sql file from remote to local server 
+rsync-data $REMOTE $SSHUSER "$DATAFOLDER/$REMOTEDB.sql" "$DATAFOLDER/$LOCALDB.sql"
+# Restore Database on local server
+restore-postgres $LOCALDB $DATAUSER "$DATAFOLDER/$LOCALDB.sql"
+# Copy Media folder
+rsync-data $REMOTE $SSHUSER $MEDIASOURCE $MEDIADEST
+# Migrate Django
+/opt/{{ csdt_django_app_name }}/bin/python {{ csdt_django_git_destination }}/manage.py migrate --fake-initial --no-input
