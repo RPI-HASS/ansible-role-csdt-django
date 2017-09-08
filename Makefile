@@ -9,12 +9,14 @@ targets:
   install install locally
   clean   remove all Docker images
   help    show this screen
+	debug   Run inspec tests then login to container
 
 machine targets:
 
   <machine>        build <machine> image
   <machine> clean  remove <machine> image
   <machine> test   provision and test <machine>
+	<machine> debug  provision and test <machine> then login to container
 
 machines:
 
@@ -57,6 +59,13 @@ else
 	$(error `test` requires a machine name, see `make help`)
 endif
 
+debug:
+ifeq (true,$(call is_machine_target))
+	./scripts/ci.sh $(firstword $(MAKECMDGOALS)) $(PLAYBOOK) debug
+else
+	$(error `test` requires a machine name, see `make help`)
+endif
+
 $(BOXES):
 # Don't build an image just to delete it.
 ifeq (,$(findstring clean,$(lastword $(MAKECMDGOALS))))
@@ -66,4 +75,5 @@ endif
 .PHONY: all \
         clean \
         help \
-        test
+        test \
+				debug
