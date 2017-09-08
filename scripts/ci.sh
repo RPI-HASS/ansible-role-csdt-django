@@ -19,6 +19,7 @@ function cleanup() {
 function debug() {
   local container="$(docker-compose ps -q "${OS}")"
   docker exec -it "${container}" /bin/bash
+  cleanup
 }
 
 function main() {
@@ -74,8 +75,13 @@ printf "\n"
   # Run tests.
   docker exec -t "${container}" inspec exec "${WORKSPACE}/tests/specs/${PLAYBOOK}_spec.rb"
 }
-[[ -z "${CI:-}" ]] && trap debug ERR
-trap cleanup EXIT
+
+#Debug running container
+if [ "${@: -1}" = "debug" ] 
+then
+  trap debug EXIT
+else
+  trap cleanup EXIT
+fi
 
 main "${@}"
-#debug "${@}"

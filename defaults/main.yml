@@ -48,3 +48,12 @@ csdt_django_gunicorn_user: "www-data"
 csdt_django_supervisord_command: "{{ csdt_django_gunicorn_command }} -c {{ csdt_django_git_destination }}/gunicorn_config.py {{ csdt_django_app_name }}.wsgi --user={{ csdt_django_supervisord_user }}"
 csdt_django_supervisord_directory: "{{ csdt_django_git_destination }}"
 csdt_django_supervisord_user: "www-data"
+
+# Configure sync script variables
+csdt_django_sync_script_remote: "prod.fqdn.edu"
+csdt_django_sync_script_sshuser: "postgres"
+csdt_django_sync_script_remotedb: "{{ csdt_django_secret_db }}"
+csdt_django_sync_script_localdb: "{{ csdt_django_secret_db }}"
+csdt_django_sync_script_datauser: "{{ csdt_django_secret_user }}"
+csdt_django_sync_script_mediasource: "{{ csdt_django_git_destination }}/media/"
+csdt_django_sync_script_mediadest: "{{ csdt_django_git_destination }}/media/"

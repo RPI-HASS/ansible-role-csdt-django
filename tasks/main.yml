@@ -50,6 +50,28 @@
     name: gunicorn
     virtualenv: "/opt/{{ csdt_django_app_name }}"
 
+# Configure Custom Scripts
+
+- name: Create Scripts Directory 
+  file: 
+    path: "/opt/{{ csdt_django_app_name }}/csdt_scripts"
+    state: directory
+- name: Copy custom scripts
+  template:
+    src: "templates/{{ item }}.j2"
+    dest: "/opt/{{ csdt_django_app_name }}/csdt_scripts/{{ item }}"
+    mode: "0655"
+  with_items:
+    - "csdt-sync.sh"
+- name: Add csdt-sync to cron
+  cron:
+    name: "Sync csdt database and media"
+    minute: 0
+    hour: 12
+    weekday: 5
+    job: "/opt/{{ csdt_django_app_name }}/csdt_scripts/csdt-sync.sh --remote={{ csdt_django_sync_script_remote }} --sshuser={{ csdt_django_sync_script_sshuser }} --remotedb={{ csdt_django_sync_script_remotedb }} --localdb={{ csdt_django_sync_script_localdb }} --datauser={{ csdt_django_sync_script_datauser }} --mediasource={{ csdt_django_sync_script_mediasource }} --mediadest={{ csdt_django_sync_script_mediadest }}"
+
+
 # Create configuration file
 
 - name: Set file permissions on manage.py
