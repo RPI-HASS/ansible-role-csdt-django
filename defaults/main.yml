@@ -50,6 +50,7 @@ csdt_django_supervisord_directory: "{{ csdt_django_git_destination }}"
 csdt_django_supervisord_user: "www-data"
 
 # Configure sync script variables
+csdt_django_sync_script_cron_enabled: false
 csdt_django_sync_script_remote: "prod.fqdn.edu"
 csdt_django_sync_script_sshuser: "postgres"
 csdt_django_sync_script_remotedb: "{{ csdt_django_secret_db }}"

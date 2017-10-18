@@ -70,6 +70,12 @@
     hour: 12
     weekday: 5
     job: "/opt/{{ csdt_django_app_name }}/csdt_scripts/csdt-sync.sh --remote={{ csdt_django_sync_script_remote }} --sshuser={{ csdt_django_sync_script_sshuser }} --remotedb={{ csdt_django_sync_script_remotedb }} --localdb={{ csdt_django_sync_script_localdb }} --datauser={{ csdt_django_sync_script_datauser }} --mediasource={{ csdt_django_sync_script_mediasource }} --mediadest={{ csdt_django_sync_script_mediadest }}"
+  when: csdt_django_sync_script_cron_enabled
+- name: Remove csdt-sync from cron (if disabled)
+  cron:
+    name: "Sync csdt database and media"
+    state: absent
+  when: not csdt_django_sync_script_cron_enabled
 
 
 # Create configuration file
