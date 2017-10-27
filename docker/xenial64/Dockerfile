@@ -21,7 +21,7 @@ RUN apt-key add /tmp/chef.asc \
       ansible \
       git \
       sudo \
-      inspec=1.25.0-1 \
+      inspec=1.43.5-1 \
       coreutils \
       net-tools \
     && apt-get autoremove \
