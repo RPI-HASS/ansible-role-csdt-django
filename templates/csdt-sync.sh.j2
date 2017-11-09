@@ -64,6 +64,13 @@ function restore-postgres {
     su - postgres -c "psql $1 -c \"GRANT ALL ON ALL TABLES IN SCHEMA public to $2\""
     su - postgres -c "psql $1 -c \"GRANT ALL ON ALL SEQUENCES IN SCHEMA public to $2\""
     su - postgres -c "psql $1 -c \"GRANT ALL ON ALL FUNCTIONS IN SCHEMA public to $2\""
+
+    su - postgres <<'EOF'
+for tbl in `psql -qAt -c "select tablename from pg_tables where schemaname = 'public';" {{ csdt_django_secret_db }}` ; do  psql -c "alter table \"$tbl\" owner to {{ csdt_django_secret_user }}" {{ csdt_django_secret_db }} ; done  
+for tbl in `psql -qAt -c "select sequence_name from information_schema.sequences where sequence_schema = 'public';" {{ csdt_django_secret_db }}` ; do  psql -c "alter table \"$tbl\" owner to {{ csdt_django_secret_user }}" {{ csdt_django_secret_db }} ; done
+for tbl in `psql -qAt -c "select table_name from information_schema.views where table_schema = 'public';" {{ csdt_django_secret_db }}` ; do  psql -c "alter table \"$tbl\" owner to {{ csdt_django_secret_user }}" {{ csdt_django_secret_db }} ; done
+EOF
+
 }
 
 REMOTE="localhost"
